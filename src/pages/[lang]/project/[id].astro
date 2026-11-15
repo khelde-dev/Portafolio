@@ -10,6 +10,7 @@ import { DEFAULT_LOCALE } from "@/i18n/locales";
 import Layout from "@/layouts/Layout.astro";
 import { api } from "@/lib/api";
 import { mediaUrl } from "@/lib/media";
+import { SITE_NAME } from "@/lib/structuredData";
 import { techIconUrl } from "@/lib/techIcon";
 import { cn } from "@/lib/utils";
 import type { Projects } from "@/types/currentLang.interface";
@@ -71,6 +72,19 @@ const pageTitle = project
 	? `${project.title} — ${i18n.HEADER.HEADER_NAME}`
 	: undefined;
 const imageUrl = project ? mediaUrl(project.card_image) : undefined;
+const siteOrigin = Astro.site ?? new URL(Astro.url.origin);
+const breadcrumbs = project
+	? [
+			{
+				name: SITE_NAME,
+				url: new URL(`/${currentLocale}/home`, siteOrigin).toString(),
+			},
+			{
+				name: project.title,
+				url: new URL(Astro.url.pathname, siteOrigin).toString(),
+			},
+		]
+	: undefined;
 
 // El carrusel: la imagen de la tarjeta y despues la galeria del CMS, sin repetir.
 const galleryKeys = project
@@ -103,7 +117,12 @@ const pill = "h-auto min-h-11 gap-2 rounded-full px-5 py-3";
 const year = new Date().getFullYear();
 ---
 
-<Layout title={pageTitle} description={project?.description} image={imageUrl}>
+<Layout
+  title={pageTitle}
+  description={project?.description}
+  image={imageUrl}
+  breadcrumbs={breadcrumbs}
+>
   <header class="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
     <div class="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between gap-4 px-6">
       <a

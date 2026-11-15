@@ -13,6 +13,7 @@ export const GET: APIRoute = ({ site, url }) => {
 		"Disallow: /api",
 		"",
 		`Sitemap: ${new URL("/sitemap-index.xml", origin).toString()}`,
+		`Sitemap: ${new URL("/sitemap-projects.xml", origin).toString()}`,
 		"",
 	].join("\n");
 

@@ -121,8 +121,96 @@ describe("buildLlmsTxt", () => {
 			"## Pages",
 			"## Contact and profiles",
 			"## Projects",
+			"## How this website is built",
 			"## Notes",
 		]);
+	});
+
+	it("el perfil agrega secciones; sin perfil no aparecen", () => {
+		const bare = buildLlmsTxt(base);
+		for (const h of [
+			"## About",
+			"## Skills",
+			"## Experience",
+			"## Education",
+			"## Opinions",
+		]) {
+			expect(bare).not.toContain(h);
+		}
+		const out = buildLlmsTxt({
+			...base,
+			profile: {
+				about: { title_card: "Dev.", description: "Hago apps." },
+				skills: [{ title: "Backend", images_topics: ["nest", "nest", "ts"] }],
+				experience: [
+					{
+						work: null,
+						title: "Dev",
+						description: "Acme · Full-time",
+						time: "2024",
+						location:
+							"Calle Larga 123, Colonia Centro, Alcaldia, 11850, Ciudad, Pais",
+					},
+				],
+				education: [
+					{
+						institution: "UPVM",
+						subtitle: "Eng",
+						period: "2018",
+						description: "Largo detalle",
+					},
+				],
+				opinions: 13,
+			},
+		});
+		expect(out).toContain("- Backend: NestJS, TypeScript");
+		expect(out).toContain("- Dev at Acme (2024)");
+		expect(out).not.toContain("Calle Larga");
+		expect(out).toContain("- Eng, UPVM (2018)");
+		expect(out).not.toContain("Largo detalle");
+		expect(out).toContain(
+			"[13 public opinions](https://khelde.dev/es/home#opinions)",
+		);
+		const full = buildLlmsTxt({
+			...base,
+			mode: "full",
+			profile: {
+				about: null,
+				skills: [],
+				experience: [],
+				education: [
+					{
+						institution: "UPVM",
+						subtitle: "Eng",
+						description: "Largo detalle",
+					},
+				],
+				opinions: null,
+			},
+		});
+		expect(full).toContain("Largo detalle");
+		expect(full).not.toContain("## Opinions");
+	});
+
+	it("cuenta en que proyectos se usa cada tecnologia, sin repetir titulos", () => {
+		const out = buildLlmsTxt({
+			...base,
+			projects: [
+				project({
+					slug: "a",
+					title: "A",
+					images_topics: ["nest", "nest", "ts"],
+				}),
+				project({ slug: "b", title: "B", images_topics: ["nest"] }),
+				project({ slug: "c", title: "C", images_topics: ["go"] }),
+			],
+		});
+		expect(out).toContain("## Technologies used in real projects");
+		expect(out).toContain("- NestJS (2 projects): A; B");
+		expect(out).toContain("- TypeScript (1 project): A");
+		// las mas usadas primero
+		expect(out.indexOf("- NestJS")).toBeLessThan(out.indexOf("- Go ("));
+		expect(buildLlmsTxt(base)).not.toContain("Technologies used");
 	});
 
 	it("codifica el slug en la URL de la pagina", () => {

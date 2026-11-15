@@ -168,7 +168,7 @@ describe("superficie de XSS", () => {
 		// Los scripts son constantes de src/lib/inlineScripts.ts (texto del repo, no
 		// datos de nadie) y su hash esta en el CSP (astro.config.mjs).
 		expect(uses).toEqual([
-			'src/layouts/Layout.astro -> JSON.stringify(personSchema).replaceAll("<", "\\\\u003c")',
+			'src/layouts/Layout.astro -> JSON.stringify(structuredData).replaceAll("<", "\\\\u003c")',
 			"src/layouts/Layout.astro -> MOTION_GATE_SCRIPT",
 			"src/layouts/Layout.astro -> THEME_SCRIPT",
 			"src/layouts/Layout.astro -> INTRO_GATE_SCRIPT",

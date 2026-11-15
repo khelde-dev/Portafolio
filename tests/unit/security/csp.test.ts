@@ -28,6 +28,23 @@ describe("CSP con hashes (security.csp de Astro)", () => {
 		}
 	});
 
+	it("deja pasar el beacon de Cloudflare Web Analytics y nada mas de terceros", () => {
+		expect(config).toContain(
+			`resources: ["'self'", TURNSTILE_ORIGIN, CF_ANALYTICS_SCRIPT]`,
+		);
+		expect(config).toContain(
+			"connect-src 'self' $" +
+				"{TURNSTILE_ORIGIN} $" +
+				"{CF_ANALYTICS_CONNECT}",
+		);
+		expect(config).toContain(
+			'const CF_ANALYTICS_SCRIPT = "https://static.cloudflareinsights.com"',
+		);
+		expect(config).toContain(
+			'const CF_ANALYTICS_CONNECT = "https://cloudflareinsights.com"',
+		);
+	});
+
 	it("ningun script ni etiqueta de estilo abre la puerta con unsafe-inline", () => {
 		// Solo los atributos style="" (que no ejecutan codigo) lo llevan.
 		expect([...config.matchAll(/'unsafe-inline'/g)]).toHaveLength(1);
