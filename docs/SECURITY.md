@@ -57,6 +57,11 @@ cada build:
   ni un proxy que los pida, y un nombre sin icono recibe `_fallback.svg`.
   `challenges.cloudflare.com` (Turnstile) está en `script-src`, `frame-src` y
   `connect-src`; además `base-uri`, `object-src`, `frame-ancestors` y `form-action`.
+- **Cloudflare Web Analytics.** Con el proxy activo, Cloudflare inyecta en cada
+  página su `beacon.min.js` (no se puede hashear). `static.cloudflareinsights.com`
+  está en `script-src` y `cloudflareinsights.com` en `connect-src`; sin ellos el
+  navegador bloquea el beacon y la consola y Lighthouse registran el error. Si algún día
+  se apaga Web Analytics en el panel, se pueden quitar de `astro.config.mjs`.
 - **Turnstile + límite.** Los dos POST públicos exigen el token de Turnstile
   (`src/lib/turnstile.ts`, falla cerrado en producción sin `TURNSTILE_SECRET_KEY`) y
   pasan por el binding `RL_PUBLIC_WRITE` con clave `<ruta>:<IP del visitante>`. La IP
