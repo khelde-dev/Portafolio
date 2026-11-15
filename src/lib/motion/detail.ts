@@ -36,7 +36,11 @@ export const projectDetail = ({
 	const figure = pick("[data-detail-figure]");
 
 	const split = title
-		? SplitText.create(title, { type: "lines,chars", mask: "lines" })
+		? SplitText.create(title, {
+				type: "lines,chars",
+				tag: "span",
+				mask: "lines",
+			})
 		: undefined;
 
 	const tl = gsap.timeline({

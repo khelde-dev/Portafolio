@@ -35,7 +35,11 @@ export const manifestoScene = ({
 	// aria "none": the words stay real inline text, so screen readers read the
 	// sentence as is. The default adds aria-label to this <p>, which is not
 	// allowed on a paragraph (axe: aria-allowed-attr).
-	const split = SplitText.create(text, { type: "words", aria: "none" });
+	const split = SplitText.create(text, {
+		type: "words",
+		tag: "span",
+		aria: "none",
+	});
 
 	const tl = gsap.timeline({
 		defaults: { ease: "none" },

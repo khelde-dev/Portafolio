@@ -6,13 +6,13 @@ y contacto). Este documento resume cómo se protege y cómo se prueba.
 
 ## Modelo de amenazas
 
-| Activo | Riesgo | Control |
-|---|---|---|
+| Activo                                 | Riesgo                                        | Control                                                                                                                                                                                                                                 |
+| -------------------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Token del backend (`API_SECRET_TOKEN`) | Filtración al navegador, al repo o a los logs | Secreto de servidor (`astro:env`), prueba de que solo vive en rutas de servidor, escáner del bundle del cliente, cliente único con `fetch` (`src/lib/api.ts`) cuyo error lleva solo el estado HTTP, y logs que imprimen solo el mensaje |
-| Backend (D1) | Que alguien lo escriba saltándose el sitio | El token solo lo conoce el Worker del sitio; el backend valida y limita por su cuenta |
-| Formularios públicos | Spam, CSRF, cuerpos enormes o malformados | Origen, `Content-Type: application/json`, tope de 10 KB, validación Zod, límite de 5 peticiones por minuto |
-| Visitantes | XSS, clickjacking, sniffing | Cabeceras de seguridad, sin `innerHTML`, `rel="noopener"` |
-| Cadena de suministro | Dependencias vulnerables, secretos en commits | `pnpm audit` en el CI, Dependabot, dependency review, gitleaks, CodeQL |
+| Backend (D1)                           | Que alguien lo escriba saltándose el sitio    | El token solo lo conoce el Worker del sitio; el backend valida y limita por su cuenta                                                                                                                                                   |
+| Formularios públicos                   | Spam, CSRF, cuerpos enormes o malformados     | Origen, `Content-Type: application/json`, tope de 10 KB, validación Zod, límite de 5 peticiones por minuto                                                                                                                              |
+| Visitantes                             | XSS, clickjacking, sniffing                   | Cabeceras de seguridad, sin `innerHTML`, `rel="noopener"`                                                                                                                                                                               |
+| Cadena de suministro                   | Dependencias vulnerables, secretos en commits | `pnpm audit` en el CI, Dependabot, dependency review, gitleaks, CodeQL                                                                                                                                                                  |
 
 ## Proxy `/api/*` (`src/pages/api/`)
 
@@ -52,17 +52,18 @@ cada build:
 - Los atributos `style=""` (Astro, React y GSAP los ponen) no se pueden hashear:
   solo ellos llevan `style-src-attr 'unsafe-inline'`. No ejecutan código.
 - `img-src` permite el bucket de R2 (`PUBLIC_MEDIA_URL`) y `cdn.jsdelivr.net`
-  (banderas). Los iconos de tecnologías salen de `/api/icons/<nombre>` (el Worker
-  los pide a go-skill-icons, licencia MIT, y Cloudflare los guarda 30 días).
+  (banderas). Los iconos de tecnologías son SVG propios en `public/icons/<nombre>.svg`
+  (go-skill-icons con licencia MIT, devicon y simple-icons): ya no hay un servicio externo
+  ni un proxy que los pida, y un nombre sin icono recibe `_fallback.svg`.
   `challenges.cloudflare.com` (Turnstile) está en `script-src`, `frame-src` y
   `connect-src`; además `base-uri`, `object-src`, `frame-ancestors` y `form-action`.
 - **Turnstile + límite.** Los dos POST públicos exigen el token de Turnstile
   (`src/lib/turnstile.ts`, falla cerrado en producción sin `TURNSTILE_SECRET_KEY`) y
   pasan por el binding `RL_PUBLIC_WRITE` con clave `<ruta>:<IP del visitante>`. La IP
   también viaja al backend en `X-Visitor-IP` para su propio límite.
-- **Al comprar el dominio (khelde.dev):** actualizar `SITE_URL`, `PUBLIC_MEDIA_URL`
+- **Dominio (khelde.dev), hecho:** se actualizaron `SITE_URL`, `PUBLIC_MEDIA_URL`
   (`media.khelde.dev`), `ALLOWED_ORIGINS` del backend, el widget de Turnstile y la
-  aplicación de Access del admin (`admin.khelde.dev`); después, `workers_dev: false`.
+  aplicación de Access del admin (`admin.khelde.dev`), y después se apagó `workers_dev`.
 - **Avisos:** `react-hot-toast` inyectaba su CSS en una etiqueta `<style>` en tiempo
   de ejecución, algo que un CSP con hashes no admite; se reemplazó por
   `src/components/Toaster.tsx`, que solo usa clases de Tailwind.

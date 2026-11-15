@@ -20,6 +20,8 @@ export const splitTitles = ({ gsap, SplitText }: MotionTools): Cleanup =>
 		let stopSeen: Cleanup | undefined;
 		const split = SplitText.create(el, {
 			type: "lines",
+			// <span>: the titles are headings, which only admit phrasing content.
+			tag: "span",
 			mask: "lines",
 			autoSplit: true,
 			onSplit: (self) => {
