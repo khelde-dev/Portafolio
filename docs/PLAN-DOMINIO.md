@@ -12,9 +12,11 @@ olvidar ningún lugar.
 > ✅ registrado en Bing Webmaster Tools. Lo tachado (~~así~~) ya está hecho. También hechos:
 > zona activa y Custom Domains, Turnstile y Access con el hostname nuevo, variables y valores
 > por defecto de `astro.config.mjs`, y los enlaces externos (CV, LinkedIn, Instagram, GitHub,
-> portafolio). Pendiente de confirmar: las reglas del dominio (`www` → apex, caché de
-> `media`, hotlinking), las pruebas de los pasos 4 y 6, el cierre de lo viejo (paso 7:
-> `r2.dev`, `preview_urls`, hostnames de `workers.dev`) y el resto de la lista de verificación.
+> portafolio), la propiedad verificada y el sitemap enviado en Google Search Console y Bing, la
+> redirección `www` → apex, las pruebas de los pasos 4 y 6 (incluidos los formularios con
+> Turnstile) y el cierre de lo viejo (paso 7: `r2.dev`, `preview_urls`, hostnames de
+> `workers.dev`, recursos de Vercel y del Turnstile anterior). Pendiente de confirmar: la caché de
+> `media`, el hotlinking y las últimas casillas de la lista de verificación (admin).
 
 ## Dominios actuales
 
@@ -40,16 +42,16 @@ olvidar ningún lugar.
 
 ### 1. Cloudflare (panel)
 
-| Dónde                                                            | Qué hacer                                                                                                                       |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| ~~Agregar el sitio (zona)~~ ✅ | Dominio en la cuenta, nameservers apuntando a Cloudflare, zona **activa**                                                       |
-| ~~Workers → `portafolio` → Settings → Domains & Routes~~ ✅ | Agregar **Custom domain** `khelde.dev` (+ `www`)                                                                                |
-| ~~Workers → `backend-portafolio` → Domains & Routes~~ ✅ | Agregar **Custom domain** `api.khelde.dev`                                                                                      |
-| ~~Workers → `portafolio-admin` → Domains & Routes~~ ✅ | Agregar **Custom domain** `admin.khelde.dev`                                                                                    |
+| Dónde                                                                   | Qué hacer                                                                                                                       |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| ~~Agregar el sitio (zona)~~ ✅                                          | Dominio en la cuenta, nameservers apuntando a Cloudflare, zona **activa**                                                       |
+| ~~Workers → `portafolio` → Settings → Domains & Routes~~ ✅             | Agregar **Custom domain** `khelde.dev` (+ `www`)                                                                                |
+| ~~Workers → `backend-portafolio` → Domains & Routes~~ ✅                | Agregar **Custom domain** `api.khelde.dev`                                                                                      |
+| ~~Workers → `portafolio-admin` → Domains & Routes~~ ✅                  | Agregar **Custom domain** `admin.khelde.dev`                                                                                    |
 | ~~R2 → bucket `portfolio` → Settings → **Dominios personalizados**~~ ✅ | Agregar `media.khelde.dev`                                                                                                      |
-| ~~Turnstile → widget `portafolio`~~ ✅ | Agregar el hostname `khelde.dev` (conservar el de `workers.dev` hasta el final)                                                 |
-| ~~Zero Trust → Access → aplicación del admin~~ ✅ | Agregar `admin.khelde.dev` como **destino adicional de la misma aplicación**                                                    |
-| Reglas del dominio                                               | Redirección `www` → apex; regla de caché larga para `media.khelde.dev` (las claves nunca cambian); protección contra hotlinking |
+| ~~Turnstile → widget `portafolio`~~ ✅                                  | Agregar el hostname `khelde.dev` (conservar el de `workers.dev` hasta el final)                                                 |
+| ~~Zero Trust → Access → aplicación del admin~~ ✅                       | Agregar `admin.khelde.dev` como **destino adicional de la misma aplicación**                                                    |
+| Reglas del dominio                                                      | Redirección `www` → apex; regla de caché larga para `media.khelde.dev` (las claves nunca cambian); protección contra hotlinking |
 
 Los Custom Domains de Workers crean el DNS y el certificado solos.
 
@@ -112,34 +114,35 @@ Los Custom Domains de Workers crean el DNS y el certificado solos.
 
 Son enlaces que **nadie actualiza solo**: si se olvidan, siguen mandando a `workers.dev`.
 
-| Dónde                                                                                      | Qué cambiar                                                                                                                                                                                                                                                                          |
-| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ~~**CV** (PDF)~~ ✅ | El enlace al portafolio. Hay que volver a exportar y **subir el PDF nuevo** desde el admin (ver `cv_pdf`).                                                                                                                                                                           |
-| ~~**LinkedIn**~~ ✅ | El sitio web del perfil y cualquier sección "Destacados" o experiencia que cite el portafolio.                                                                                                                                                                                       |
-| ~~**Instagram**~~ ✅ | El enlace de la biografía.                                                                                                                                                                                                                                                           |
+| Dónde                                                                                             | Qué cambiar                                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ~~**CV** (PDF)~~ ✅                                                                               | El enlace al portafolio. Hay que volver a exportar y **subir el PDF nuevo** desde el admin (ver `cv_pdf`).                                                                                                                                                                           |
+| ~~**LinkedIn**~~ ✅                                                                               | El sitio web del perfil y cualquier sección "Destacados" o experiencia que cite el portafolio.                                                                                                                                                                                       |
+| ~~**Instagram**~~ ✅                                                                              | El enlace de la biografía.                                                                                                                                                                                                                                                           |
 | ~~**GitHub, los tres repositorios** (`Portafolio`, `Backend_Portafolio`, `Portafolio_admin`)~~ ✅ | Campo **Website** y descripción del **About** de cada repositorio.                                                                                                                                                                                                                   |
-| ~~**GitHub, perfil de `muke78`**~~ ✅ | El campo **Website** del perfil y los enlaces sociales de la cuenta.                                                                                                                                                                                                                 |
-| ~~**README del perfil** (`muke78/muke78`, el `.md` que se ve en el perfil)~~ ✅ | Todos los enlaces al portafolio.                                                                                                                                                                                                                                                     |
-| ~~**El propio portafolio**~~ ✅ | Enlaces al sitio dentro de su contenido: `README.md` de este repositorio y cualquier texto del admin (Sobre mí, descripciones, "Textos") que cite la URL vieja. Lo que sale de `SITE_URL` (canónicos, sitemap, `robots.txt`, `llms.txt`, JSON-LD) cambia solo en el siguiente build. |
-| ~~README y documentación~~ ✅ | Los tres repositorios: buscar la URL vieja (`git grep workers.dev`) y reemplazarla.                                                                                                                                                                                                  |
-| ~~Google Search Console~~ ✅                                                               | ~~Registrar `khelde.dev`~~ (hecho). Pendiente solo: enviar el sitemap cuando el sitio responda en el dominio nuevo.                                                                                                                                                                  |
-| ~~Bing Webmaster Tools~~ ✅                                                                | ~~Registrar `khelde.dev`~~ (hecho). Pendiente solo: enviar el sitemap cuando el sitio responda en el dominio nuevo.                                                                                                                                                                  |
+| ~~**GitHub, perfil de `muke78`**~~ ✅                                                             | El campo **Website** del perfil y los enlaces sociales de la cuenta.                                                                                                                                                                                                                 |
+| ~~**README del perfil** (`muke78/muke78`, el `.md` que se ve en el perfil)~~ ✅                   | Todos los enlaces al portafolio.                                                                                                                                                                                                                                                     |
+| ~~**El propio portafolio**~~ ✅                                                                   | Enlaces al sitio dentro de su contenido: `README.md` de este repositorio y cualquier texto del admin (Sobre mí, descripciones, "Textos") que cite la URL vieja. Lo que sale de `SITE_URL` (canónicos, sitemap, `robots.txt`, `llms.txt`, JSON-LD) cambia solo en el siguiente build. |
+| ~~README y documentación~~ ✅                                                                     | Los tres repositorios: buscar la URL vieja (`git grep workers.dev`) y reemplazarla.                                                                                                                                                                                                  |
+| ~~Google Search Console~~ ✅                                                                      | ~~Registrar `khelde.dev`~~ y ~~enviar `sitemap-index.xml`~~ (hecho).                                                                                                                                                                                                                 |
+| ~~Bing Webmaster Tools~~ ✅                                                                       | ~~Registrar `khelde.dev`~~ y ~~enviar `sitemap-index.xml`~~ (hecho).                                                                                                                                                                                                                 |
 
 ## Orden recomendado (para no dejar nada caído)
 
 1. ✅ ~~Comprar el dominio y esperar a que la zona esté activa.~~
 2. ✅ Agregar los Custom Domains (sitio, backend, admin) y el de R2. **No** tocar variables todavía.
 3. ✅ Turnstile: agregar `khelde.dev`. Access: agregar `admin.khelde.dev` a la misma aplicación.
-4. Probar cada hostname nuevo: `https://api.khelde.dev/api` (salud), una imagen en
+4. ✅ Probar cada hostname nuevo: `https://api.khelde.dev/api` (salud), una imagen en
    `https://media.khelde.dev/<clave>` y el login del admin en `https://admin.khelde.dev`.
 5. ✅ Cambiar variables y redesplegar en este orden: **backend → sitio → admin**.
-6. Verificar: el sitio carga imágenes y proyectos, los formularios (comentario y contacto)
+6. ✅ Verificar: el sitio carga imágenes y proyectos, los formularios (comentario y contacto)
    guardan, el admin entra con Access y sube una imagen.
-7. Solo entonces cerrar lo viejo:
-   - R2: desactivar la **URL pública de desarrollo** (`r2.dev`).
-   - Cada Worker: `"workers_dev": false` y `"preview_urls": false` en su `wrangler.jsonc`.
-   - Turnstile: quitar el hostname de `workers.dev`.
-   - Access: quitar el destino de `workers.dev` del admin.
+7. ✅ Solo entonces cerrar lo viejo:
+   - ✅ R2: desactivar la **URL pública de desarrollo** (`r2.dev`).
+   - ✅ Cada Worker: `"workers_dev": false` y `"preview_urls": false` en su `wrangler.jsonc`.
+   - ✅ Turnstile: quitar el hostname de `workers.dev` y borrar el widget anterior.
+   - ✅ Access: quitar el destino de `workers.dev` del admin.
+   - ✅ Borrar los recursos de Vercel y las ramas remotas ya mergeadas.
 8. ✅ Actualizar los valores por defecto de `astro.config.mjs` y la documentación (rama aparte).
 9. ✅ Cambiar los enlaces de la sección 6: CV, LinkedIn, Instagram, GitHub (repositorios, perfil y README del perfil) y los del propio portafolio.
 
@@ -150,13 +153,15 @@ pública (`VITE_API_URL`); solo el admin usa Service Binding.
 ## Lista de verificación
 
 - [x] Zona activa y certificados emitidos para los cuatro hostnames.
-- [ ] `https://khelde.dev/es/home` carga con fotos, proyectos e iconos.
-- [ ] `https://khelde.dev/robots.txt` y el sitemap listan `khelde.dev`.
-- [ ] Un comentario y un mensaje de contacto se guardan (Turnstile con el hostname nuevo).
+- [x] `https://khelde.dev/es/home` carga con fotos, proyectos e iconos.
+- [x] `https://khelde.dev/robots.txt` y el sitemap listan `khelde.dev`.
+- [x] Un comentario y un mensaje de contacto se guardan (Turnstile con el hostname nuevo).
 - [ ] `https://admin.khelde.dev` pide el login de Access y deja entrar solo al correo permitido.
 - [ ] Subir y borrar una imagen desde el admin funciona y se ve en `media.khelde.dev`.
 - [ ] `/estado` del admin: todo en "Correcto", conexión por Service Binding.
-- [ ] `r2.dev` y `workers.dev` ya no responden.
+- [x] `r2.dev` y `workers.dev` ya no responden.
+- [x] `www.khelde.dev` redirige a `khelde.dev`.
+- [x] Google Search Console y Bing: propiedad verificada, `sitemap-index.xml` enviado e indexación de `/es/home`, `/en/home` y `/fr/home` solicitada.
 - [x] CV (PDF nuevo subido desde el admin), LinkedIn e Instagram apuntan al dominio nuevo.
 - [x] GitHub: Website y About de los tres repositorios, Website del perfil de `muke78` y README del perfil (`muke78/muke78`) apuntan al dominio nuevo.
 - [x] Dentro del portafolio: `README.md` y los textos del admin ya no citan `workers.dev`.
