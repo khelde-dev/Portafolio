@@ -114,4 +114,32 @@ describe("public/_headers (archivos estaticos)", () => {
 	it("aplica a todas las rutas", () => {
 		expect(file).toMatch(/^\/\*\s*$/m);
 	});
+
+	it("da 30 dias de cache a los iconos y a los archivos de marca de nombre fijo", () => {
+		// Bloques de `_headers`: una ruta sin sangria y, debajo, sus cabeceras con sangria.
+		const blocks = new Map<string, string[]>();
+		let current = "";
+		for (const line of file.split("\n")) {
+			if (!line.trim() || line.trim().startsWith("#")) continue;
+			if (/^\S/.test(line)) {
+				current = line.trim();
+				blocks.set(current, []);
+			} else {
+				blocks.get(current)?.push(line.trim());
+			}
+		}
+		for (const route of [
+			"/icons/*",
+			"/favicon.ico",
+			"/icon-192.png",
+			"/apple-touch-icon.png",
+			"/logo-og.png",
+		]) {
+			expect(blocks.get(route), route).toEqual([
+				"Cache-Control: public, max-age=2592000",
+			]);
+		}
+		// Nada con nombre fijo es `immutable`: un icono cambiado se veria viejo un año.
+		expect(file).not.toMatch(/Cache-Control:.*immutable/);
+	});
 });
