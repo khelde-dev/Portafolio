@@ -12,6 +12,7 @@ describe("robots.txt", () => {
 		expect(res.headers.get("Content-Type")).toContain("text/plain");
 		const body = await res.text();
 		expect(body).toContain("Sitemap: https://khelde.dev/sitemap-index.xml");
+		expect(body).toContain("Sitemap: https://khelde.dev/sitemap-projects.xml");
 		expect(body).not.toContain("vercel");
 	});
 

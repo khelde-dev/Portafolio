@@ -63,6 +63,9 @@ export default defineConfig({
 			// locale URLs are a small, fixed, known set - list them directly
 			// instead of forcing prerendering just for sitemap discovery.
 			customPages: LOCALES.map((locale) => `${SITE_URL}/${locale}/home`),
+			// Los detalles de proyecto salen del CMS: los lista src/pages/sitemap-projects.xml.ts
+			// al pedirlo y el indice (sitemap-index.xml) lo enlaza.
+			customSitemaps: [`${SITE_URL}/sitemap-projects.xml`],
 		}),
 		compress({
 			CSS: true,
