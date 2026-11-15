@@ -11,6 +11,8 @@ export const scrubText = ({ gsap, SplitText }: MotionTools): Cleanup =>
 	watch("[data-scrub-text]", (el) => {
 		const split = SplitText.create(el, {
 			type: "words",
+			// <span>, not the default <div>: a <div> inside a <p> is invalid HTML.
+			tag: "span",
 			aria: "none",
 			autoSplit: true,
 			onSplit: (self) =>
