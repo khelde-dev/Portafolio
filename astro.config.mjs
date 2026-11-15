@@ -28,6 +28,13 @@ const MEDIA_ORIGIN = new URL(process.env.PUBLIC_MEDIA_URL ?? DEFAULT_MEDIA_URL)
 // Cloudflare Turnstile: el widget carga su script y su marco desde este origen.
 const TURNSTILE_ORIGIN = "https://challenges.cloudflare.com";
 
+// Cloudflare Web Analytics: con el proxy activo, Cloudflare inyecta su propio
+// <script> (beacon.min.js, sin hash posible) en cada pagina y el beacon envia la
+// visita a cloudflareinsights.com. Sin estos dos origenes el CSP lo bloquea y la
+// consola (y Lighthouse) registra el error.
+const CF_ANALYTICS_SCRIPT = "https://static.cloudflareinsights.com";
+const CF_ANALYTICS_CONNECT = "https://cloudflareinsights.com";
+
 // sha256 de los <script is:inline> del Layout (Astro no hashea los `is:inline`).
 const hashOf = (source) =>
 	`sha256-${createHash("sha256").update(source).digest("base64")}`;
@@ -80,7 +87,7 @@ export default defineConfig({
 				`img-src 'self' data: blob: ${MEDIA_ORIGIN} https://cdn.jsdelivr.net`,
 				"font-src 'self' data:",
 				// Turnstile (casilla anti-bots de los formularios): script, marco y conexion.
-				`connect-src 'self' ${TURNSTILE_ORIGIN}`,
+				`connect-src 'self' ${TURNSTILE_ORIGIN} ${CF_ANALYTICS_CONNECT}`,
 				"worker-src 'self' blob:",
 				"media-src 'self'",
 				"manifest-src 'self'",
@@ -93,7 +100,7 @@ export default defineConfig({
 				"form-action 'self'",
 			],
 			scriptDirective: {
-				resources: ["'self'", TURNSTILE_ORIGIN],
+				resources: ["'self'", TURNSTILE_ORIGIN, CF_ANALYTICS_SCRIPT],
 				hashes: [
 					hashOf(MOTION_GATE_SCRIPT),
 					hashOf(THEME_SCRIPT),
