@@ -28,6 +28,31 @@ const loadEverything = async (page: Page) => {
 	await page.evaluate(() => window.scrollTo(0, 0));
 };
 
+/**
+ * Waits until the page stops growing. Pictures, fonts and data keep moving the
+ * sections that sit above a pinned rail for a while after the first paint; every
+ * move shifts the rail's scroll range, so a test that scrolls to a card before
+ * the layout settles lands on the wrong spot (flaky "toBeInViewport").
+ */
+const waitForStableLayout = async (page: Page, selector: string) => {
+	await page.waitForLoadState("networkidle");
+	let previous = -1;
+	for (let i = 0; i < 40; i++) {
+		const now = await page.evaluate(
+			(sel) =>
+				Math.round(
+					document.documentElement.scrollHeight +
+						(document.querySelector(sel)?.getBoundingClientRect().top ?? 0) +
+						window.scrollY,
+				),
+			selector,
+		);
+		if (now === previous) return;
+		previous = now;
+		await page.waitForTimeout(250);
+	}
+};
+
 const setTheme = (page: Page, theme: "light" | "dark") =>
 	page.evaluate((t) => {
 		localStorage.setItem("theme", t);
@@ -158,6 +183,7 @@ test.describe("keyboard with the motion layer on", () => {
 		await page.goto("/es/home#projects");
 		const links = page.locator("#projects article h4 a");
 		await expect(links.first()).toBeVisible({ timeout: 15_000 });
+		await waitForStableLayout(page, "#projects [data-hscroll]");
 
 		// Every card title is a real link to the project detail route.
 		const href = await links.first().getAttribute("href");

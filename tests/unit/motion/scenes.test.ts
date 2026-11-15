@@ -144,12 +144,14 @@ describe("manifestoScene", () => {
 	it("reverts the split text when stopped", () => {
 		html(manifesto);
 		const stopScene = run(manifestoScene);
-		const words = document.querySelectorAll("[data-manifesto-text] div").length;
+		const words = document.querySelectorAll(
+			"[data-manifesto-text] span",
+		).length;
 		expect(words).toBeGreaterThan(0);
 		stopScene();
-		expect(document.querySelectorAll("[data-manifesto-text] div")).toHaveLength(
-			0,
-		);
+		expect(
+			document.querySelectorAll("[data-manifesto-text] span"),
+		).toHaveLength(0);
 		expect(ScrollTrigger.getAll()).toHaveLength(0);
 	});
 });
@@ -188,7 +190,7 @@ describe("scrubText", () => {
 	it("never starts below the legibility floor", () => {
 		html('<p data-scrub-text style="font-size: 30px">Texto grande</p>');
 		run(scrubText);
-		const words = [...document.querySelectorAll("[data-scrub-text] div")];
+		const words = [...document.querySelectorAll("[data-scrub-text] span")];
 		expect(words.length).toBeGreaterThan(0);
 		for (const w of words) {
 			expect(Number(getComputedStyle(w).opacity)).toBeGreaterThanOrEqual(0.5);
@@ -266,9 +268,9 @@ describe("maskReveals", () => {
 	it("marks the frame, then opens it when seen", () => {
 		html('<figure data-mask><img data-mask-img alt="" src="x.png" /></figure>');
 		run(maskReveals);
-		const frame = $("[data-mask]");
-		expect(frame).toHaveAttribute(REVEALED);
-		FakeIntersectionObserver.fireAll(frame);
+		const masked = $("[data-mask]");
+		expect(masked).toHaveAttribute(REVEALED);
+		FakeIntersectionObserver.fireAll(masked);
 		const tl = timelines().at(-1);
 		expect(tl?.paused()).toBe(false);
 	});
