@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 const LOCALE_TITLES = [
-	["/es/home", "Erick González — Desarrollador Full-Stack"],
-	["/en/home", "Erick González — Full-Stack Developer"],
-	["/fr/home", "Erick González — Développeur Full-Stack"],
+	["/es/home", "Erick González (muke78) — Desarrollador Full-Stack"],
+	["/en/home", "Erick González (muke78) — Full-Stack Developer"],
+	["/fr/home", "Erick González (muke78) — Développeur Full-Stack"],
 ] as const;
 
 for (const [path, title] of LOCALE_TITLES) {

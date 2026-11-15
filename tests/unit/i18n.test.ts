@@ -5,7 +5,7 @@ describe("getI18N", () => {
 	it("defaults to the Spanish locale when currentLocale is omitted", () => {
 		const i18n = getI18N({});
 		expect(i18n.META.META_TITLE).toBe(
-			"Erick González — Desarrollador Full-Stack",
+			"Erick González (muke78) — Desarrollador Full-Stack",
 		);
 	});
 
@@ -13,12 +13,16 @@ describe("getI18N", () => {
 		const es = getI18N({ currentLocale: "es" });
 		const en = getI18N({ currentLocale: "en" });
 		expect(es.META.META_TITLE).not.toBe(en.META.META_TITLE);
-		expect(en.META.META_TITLE).toBe("Erick González — Full-Stack Developer");
+		expect(en.META.META_TITLE).toBe(
+			"Erick González (muke78) — Full-Stack Developer",
+		);
 	});
 
 	it("returns content for the French locale too", () => {
 		const fr = getI18N({ currentLocale: "fr" });
-		expect(fr.META.META_TITLE).toBe("Erick González — Développeur Full-Stack");
+		expect(fr.META.META_TITLE).toBe(
+			"Erick González (muke78) — Développeur Full-Stack",
+		);
 	});
 
 	it("falls back to the default locale for an unrecognized locale string", () => {

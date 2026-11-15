@@ -3,7 +3,7 @@ import "@/styles/styles.css";
 import "@/styles/app.css";
 import { BackgroundEffects } from "@/components/three/BackgroundEffects";
 import { getI18N } from "@/i18n";
-import { DEFAULT_LOCALE } from "@/i18n/locales";
+import { DEFAULT_LOCALE, LOCALE_META, LOCALES } from "@/i18n/locales";
 import {
 	INTRO_GATE_SCRIPT,
 	MOTION_GATE_SCRIPT,
@@ -11,6 +11,11 @@ import {
 } from "@/lib/inlineScripts";
 import { getContact } from "@/lib/siteContact";
 import { getSiteCopy } from "@/lib/siteCopy";
+import {
+	alternateLinks,
+	buildStructuredData,
+	SITE_NAME,
+} from "@/lib/structuredData";
 
 interface Props {
 	/** Page <title> / og:title. Defaults to the site title. */
@@ -21,11 +26,13 @@ interface Props {
 	image?: string;
 	/** Solo el Home tiene la puerta de la introduccion (el punto cero). */
 	intro?: boolean;
+	/** Migas de pan para los datos estructurados (el detalle de proyecto). */
+	breadcrumbs?: { name: string; url: string }[];
 }
 
 const { url, site } = Astro;
 const currentLocale = Astro.currentLocale ?? DEFAULT_LOCALE;
-const { title, description, image, intro = false } = Astro.props;
+const { title, description, image, intro = false, breadcrumbs } = Astro.props;
 const i18n = getI18N({ currentLocale });
 const contact = await getContact();
 const copy = await getSiteCopy(currentLocale);
@@ -38,16 +45,24 @@ const pageTitle = title ?? i18n.META.META_TITLE;
 const siteDescription = copy?.meta_description ?? i18n.META.META_DESCRIPTION;
 const pageDescription = description ?? siteDescription;
 
-const personSchema = {
-	"@context": "https://schema.org",
-	"@type": "Person",
+const structuredData = buildStructuredData({
+	origin: siteOrigin,
+	locales: LOCALES,
 	name: i18n.HEADER.HEADER_NAME,
 	jobTitle: i18n.ABOUTME.ABOUT_TITLE_CARD,
 	description: siteDescription,
-	url: siteOrigin.toString(),
-	image: ogImageUrl,
+	imageUrl: new URL("/logo-og.png", siteOrigin).toString(),
+	logoUrl: new URL("/icon-192.png", siteOrigin).toString(),
 	sameAs: [contact.github_url, contact.linkedin_url],
-};
+	breadcrumbs,
+});
+const alternates = alternateLinks(
+	url.pathname,
+	siteOrigin,
+	LOCALES,
+	DEFAULT_LOCALE,
+);
+const ogLocale = LOCALE_META[currentLocale as keyof typeof LOCALE_META]?.bcp47;
 ---
 
 <!doctype html>
@@ -71,7 +86,11 @@ const personSchema = {
       </>
     )}
     <meta property="og:image:alt" content={i18n.META.META_IMAGE_ALT} />
-    <meta property="og:site_name" content={i18n.META.META_TITLE} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    {ogLocale && <meta property="og:locale" content={ogLocale.replace("-", "_")} />}
+    {ogLocale && LOCALES.filter((l) => l !== currentLocale).map((l) => (
+      <meta property="og:locale:alternate" content={LOCALE_META[l].bcp47.replace("-", "_")} />
+    ))}
 
     <!-- Twitter Meta Tags -->
     <meta property="twitter:card" content="summary_large_image">
@@ -91,10 +110,13 @@ const personSchema = {
     <link rel="icon" type="image/png" href="/icon-192.png" sizes="192x192" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="canonical" href={canonicalUrl} />
+    {alternates.map((alt) => (
+      <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
+    ))}
     <!-- Sitemap -->
     <link rel="sitemap" href="/sitemap-index.xml" />
     <!-- Structured data (SEO) -->
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(personSchema).replaceAll("<", "\\u003c")} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData).replaceAll("<", "\\u003c")} />
     <!-- Corren antes del primer pintado; su hash esta en el CSP (src/lib/inlineScripts.ts). -->
     <script is:inline set:html={MOTION_GATE_SCRIPT}></script>
     <script is:inline set:html={THEME_SCRIPT}></script>
