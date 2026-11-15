@@ -28,7 +28,6 @@ export const CONTACT_TTL_MS = 60_000;
 export const CONTACT_TIMEOUT_MS = 2_000;
 
 let cached: { value: SiteContact; at: number } | null = null;
-let inflight: Promise<SiteContact> | null = null;
 
 const fetchContact = async (): Promise<SiteContact> => {
 	try {
@@ -47,17 +46,20 @@ const fetchContact = async (): Promise<SiteContact> => {
 	}
 };
 
-/** Una sola peticion por ventana de tiempo, compartida por Header, pie, formulario y JSON-LD. */
+/**
+ * Una sola peticion por ventana de tiempo: lo ya resuelto lo comparten Header, pie,
+ * formulario y JSON-LD. Lo que esta en vuelo NO se comparte: una promesa creada por una
+ * peticion y esperada por otra se cancela en Workers en cuanto la primera termina
+ * ("promise created by a request that has since ended"), y la segunda peticion muere
+ * con ella. Dos llamadas simultaneas con la cache fria hacen dos pedidos; la siguiente
+ * ya sale de la cache.
+ */
 export const getContact = async (now = Date.now()): Promise<SiteContact> => {
 	if (cached && now - cached.at < CONTACT_TTL_MS) return cached.value;
-	inflight ??= fetchContact().finally(() => {
-		inflight = null;
-	});
-	return inflight;
+	return fetchContact();
 };
 
 /** Solo para pruebas. */
 export const resetContactCache = (): void => {
 	cached = null;
-	inflight = null;
 };

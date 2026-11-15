@@ -36,17 +36,27 @@ describe("getSiteCopy", () => {
 		);
 	});
 
-	it("una peticion por idioma y ventana, aunque la pidan varios a la vez", async () => {
+	it("una peticion por idioma y ventana: lo ya resuelto sale de la cache", async () => {
 		const fetchMock = reply({ data: COPY });
 		vi.stubGlobal("fetch", fetchMock);
+		await getSiteCopy("es");
 		await Promise.all([
 			getSiteCopy("es"),
 			getSiteCopy("es"),
 			getSiteCopy("es"),
 		]);
-		await getSiteCopy("es");
 		expect(fetchMock).toHaveBeenCalledTimes(1);
 		await getSiteCopy("fr");
+		expect(fetchMock).toHaveBeenCalledTimes(2);
+	});
+
+	it("no comparte promesas en vuelo entre llamadas (Workers las cancela entre peticiones)", async () => {
+		const fetchMock = reply({ data: COPY });
+		vi.stubGlobal("fetch", fetchMock);
+		const first = getSiteCopy("es");
+		const second = getSiteCopy("es");
+		expect(second).not.toBe(first);
+		await Promise.all([first, second]);
 		expect(fetchMock).toHaveBeenCalledTimes(2);
 	});
 

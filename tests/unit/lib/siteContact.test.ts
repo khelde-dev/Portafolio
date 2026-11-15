@@ -35,12 +35,22 @@ describe("getContact", () => {
 		expect(init.method).toBe("GET");
 	});
 
-	it("una sola peticion por ventana, aunque la pidan varios a la vez", async () => {
+	it("una sola peticion por ventana: lo ya resuelto sale de la cache", async () => {
 		const fetchMock = reply({ success: true, data: FROM_API });
 		vi.stubGlobal("fetch", fetchMock);
-		await Promise.all([getContact(), getContact(), getContact()]);
 		await getContact();
+		await Promise.all([getContact(), getContact(), getContact()]);
 		expect(fetchMock).toHaveBeenCalledTimes(1);
+	});
+
+	it("no comparte promesas en vuelo entre llamadas (Workers las cancela entre peticiones)", async () => {
+		const fetchMock = reply({ success: true, data: FROM_API });
+		vi.stubGlobal("fetch", fetchMock);
+		const first = getContact();
+		const second = getContact();
+		expect(second).not.toBe(first);
+		await Promise.all([first, second]);
+		expect(fetchMock).toHaveBeenCalledTimes(2);
 	});
 
 	it("pasada la ventana vuelve a preguntar y ve el cambio hecho en el CMS", async () => {
