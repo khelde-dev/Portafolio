@@ -16,7 +16,6 @@ export const SITE_COPY_TTL_MS = 60_000;
 export const SITE_COPY_TIMEOUT_MS = 2_000;
 
 const cache = new Map<string, { value: SiteCopy; at: number }>();
-const inflight = new Map<string, Promise<SiteCopy | null>>();
 
 const fetchCopy = async (locale: string): Promise<SiteCopy | null> => {
 	try {
@@ -34,22 +33,22 @@ const fetchCopy = async (locale: string): Promise<SiteCopy | null> => {
 	}
 };
 
-/** Una sola peticion por idioma y ventana, compartida por Header, Manifiesto y Layout. */
+/**
+ * Una sola peticion por idioma y ventana: lo ya resuelto lo comparten Header, Manifiesto
+ * y Layout. Lo que esta en vuelo NO se comparte: una promesa creada por una peticion y
+ * esperada por otra se cancela en Workers en cuanto la primera termina ("promise created
+ * by a request that has since ended"), y la segunda peticion muere con ella.
+ */
 export const getSiteCopy = async (
 	locale: string,
 	now = Date.now(),
 ): Promise<SiteCopy | null> => {
 	const hit = cache.get(locale);
 	if (hit && now - hit.at < SITE_COPY_TTL_MS) return hit.value;
-	const pending =
-		inflight.get(locale) ??
-		fetchCopy(locale).finally(() => inflight.delete(locale));
-	inflight.set(locale, pending);
-	return pending;
+	return fetchCopy(locale);
 };
 
 /** Solo para pruebas. */
 export const resetSiteCopyCache = (): void => {
 	cache.clear();
-	inflight.clear();
 };
