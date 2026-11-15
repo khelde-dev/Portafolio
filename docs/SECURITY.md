@@ -52,8 +52,9 @@ cada build:
 - Los atributos `style=""` (Astro, React y GSAP los ponen) no se pueden hashear:
   solo ellos llevan `style-src-attr 'unsafe-inline'`. No ejecutan código.
 - `img-src` permite el bucket de R2 (`PUBLIC_MEDIA_URL`) y `cdn.jsdelivr.net`
-  (banderas). Los iconos de tecnologías salen de `/api/icons/<nombre>` (el Worker
-  los pide a go-skill-icons, licencia MIT, y Cloudflare los guarda 30 días).
+  (banderas). Los iconos de tecnologías son SVG propios en `public/icons/<nombre>.svg`
+  (go-skill-icons con licencia MIT, devicon y simple-icons): ya no hay un servicio externo
+  ni un proxy que los pida, y un nombre sin icono recibe `_fallback.svg`.
   `challenges.cloudflare.com` (Turnstile) está en `script-src`, `frame-src` y
   `connect-src`; además `base-uri`, `object-src`, `frame-ancestors` y `form-action`.
 - **Turnstile + límite.** Los dos POST públicos exigen el token de Turnstile
