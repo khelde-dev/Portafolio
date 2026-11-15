@@ -147,11 +147,14 @@ const pill = "h-auto min-h-11 gap-2 rounded-full px-5 py-3";
           </figure>
 
           <div class="mt-12 grid grid-cols-1 items-start gap-10 md:mt-16 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-16">
-            <section aria-labelledby="project-about">
+            <section
+              aria-labelledby="project-about"
+              class="rounded-2xl border border-border bg-background/85 p-6 backdrop-blur-md md:p-8"
+            >
               <h2 id="project-about" class="font-serif-display text-subtitle" data-split>
                 {t.ABOUT}
               </h2>
-              <p class="khelde-lead mt-6 text-muted-foreground" data-scrub-text>
+              <p class="khelde-lead mt-6 text-foreground" data-scrub-text>
                 {project.description}
               </p>
             </section>
